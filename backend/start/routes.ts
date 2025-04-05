@@ -8,47 +8,59 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import { middleware } from './kernel.js'
 
-router.get('/', async () => {
-  return {
-    hello: 'world',
-  }
-})
+// Auth routes
+const AuthController = () => import('#controllers/auth_controller')
+router.post('auth/register', [AuthController, 'register'])
+router.post('auth/login', [AuthController, 'login'])
 
-// API routes
+// API V1 routes
 router.group(() => {
-  // Locations
-  router.get('/locations', '#controllers/locations_controller.index')
-  router.get('/locations/:id', '#controllers/locations_controller.show')
-  router.post('/locations', '#controllers/locations_controller.store')
-  router.put('/locations/:id', '#controllers/locations_controller.update')
-  router.delete('/locations/:id', '#controllers/locations_controller.destroy')
-
-  // Launches
-  router.get('/launches', '#controllers/launches_controller.index')
-  router.get('/launches/:id', '#controllers/launches_controller.show')
-  router.post('/launches', '#controllers/launches_controller.store')
-  router.put('/launches/:id', '#controllers/launches_controller.update')
-  router.delete('/launches/:id', '#controllers/launches_controller.destroy')
-
-  // Missions
-  router.get('/missions', '#controllers/missions_controller.index')
-  router.get('/missions/:id', '#controllers/missions_controller.show')
-  router.post('/missions', '#controllers/missions_controller.store')
-  router.put('/missions/:id', '#controllers/missions_controller.update')
-  router.delete('/missions/:id', '#controllers/missions_controller.destroy')
-
-  // Trips
-  router.get('/trips', '#controllers/trips_controller.index')
-  router.get('/trips/:id', '#controllers/trips_controller.show')
-  router.post('/trips', '#controllers/trips_controller.store')
-  router.put('/trips/:id', '#controllers/trips_controller.update')
-  router.delete('/trips/:id', '#controllers/trips_controller.destroy')
-
-  // Bookings
-  router.get('/bookings', '#controllers/bookings_controller.index')
-  router.get('/bookings/:id', '#controllers/bookings_controller.show')
-  router.post('/bookings', '#controllers/bookings_controller.store')
-  router.put('/bookings/:id', '#controllers/bookings_controller.update')
-  router.delete('/bookings/:id', '#controllers/bookings_controller.destroy')
+  // Public routes
+  const LocationsController = () => import('#controllers/locations_controller')
+  router.get('locations', [LocationsController, 'index'])
+  router.get('locations/:id', [LocationsController, 'show'])
+  
+  const LaunchesController = () => import('#controllers/launches_controller')
+  router.get('launches', [LaunchesController, 'index'])
+  router.get('launches/:id', [LaunchesController, 'show'])
+  
+  const MissionsController = () => import('#controllers/missions_controller')
+  router.get('missions', [MissionsController, 'index'])
+  router.get('missions/:id', [MissionsController, 'show'])
+  
+  const TripsController = () => import('#controllers/trips_controller')
+  router.get('trips', [TripsController, 'index'])
+  router.get('trips/:id', [TripsController, 'show'])
+  
+  // Protected routes requiring authentication
+  router.group(() => {
+    // Booking routes - all users can create and view their own bookings
+    const BookingsController = () => import('#controllers/bookings_controller')
+    router.resource('bookings', BookingsController)
+    
+    // Admin-only routes
+    router.group(() => {
+      // Admin can create/update/delete locations
+      router.post('locations', [LocationsController, 'store'])
+      router.put('locations/:id', [LocationsController, 'update'])
+      router.delete('locations/:id', [LocationsController, 'destroy'])
+      
+      // Admin can create/update/delete launches
+      router.post('launches', [LaunchesController, 'store'])
+      router.put('launches/:id', [LaunchesController, 'update'])
+      router.delete('launches/:id', [LaunchesController, 'destroy'])
+      
+      // Admin can create/update/delete missions
+      router.post('missions', [MissionsController, 'store'])
+      router.put('missions/:id', [MissionsController, 'update'])
+      router.delete('missions/:id', [MissionsController, 'destroy'])
+      
+      // Admin can create/update/delete trips
+      router.post('trips', [TripsController, 'store'])
+      router.put('trips/:id', [TripsController, 'update'])
+      router.delete('trips/:id', [TripsController, 'destroy'])
+    }).use(middleware.auth())
+  }).use(middleware.auth())
 }).prefix('/api/v1')

@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Location from '#models/location'
-import { v4 as uuidv4 } from 'uuid'
+import { createLocationValidator, updateLocationValidator } from '#validators/location_validator'
 
 export default class LocationsController {
   /**
@@ -25,10 +25,10 @@ export default class LocationsController {
    * Create a new location
    */
   async store({ request, response }: HttpContext) {
-    const data = request.only(['name'])
-
+    const payload = await request.validateUsing(createLocationValidator)
+    
     const location = await Location.create({
-      name: data.name,
+      name: payload.name,
     })
 
     return response.status(201).json(location)
@@ -41,9 +41,12 @@ export default class LocationsController {
     const { id } = params
     const location = await Location.findOrFail(id)
     
-    const data = request.only(['name'])
+    const payload = await request.validateUsing(updateLocationValidator)
 
-    location.name = data.name || location.name
+    if (payload.name) {
+      location.name = payload.name
+    }
+    
     await location.save()
     
     return response.json(location)

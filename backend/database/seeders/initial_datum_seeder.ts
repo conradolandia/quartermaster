@@ -82,7 +82,6 @@ export default class extends BaseSeeder {
       sales_open_at: DateTime.fromISO('2024-04-15T12:00:00.000Z').toSQL(),
       active: true,
       public: true,
-      refund_cutoff_hours: 12,
       created_at: DateTime.now().toSQL(),
       updated_at: DateTime.now().toSQL(),
     })

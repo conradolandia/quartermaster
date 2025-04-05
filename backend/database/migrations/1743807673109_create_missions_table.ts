@@ -11,7 +11,6 @@ export default class extends BaseSchema {
       table.timestamp('sales_open_at', { useTz: true }).notNullable()
       table.boolean('active').defaultTo(false).notNullable()
       table.boolean('public').defaultTo(false).notNullable()
-      table.integer('refund_cutoff_hours').defaultTo(12).notNullable()
 
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now())

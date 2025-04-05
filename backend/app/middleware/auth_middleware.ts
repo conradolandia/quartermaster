@@ -1,25 +1,43 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
-import type { Authenticators } from '@adonisjs/auth/types'
+import { UserRole } from '#models/user'
 
 /**
- * Auth middleware is used authenticate HTTP requests and deny
- * access to unauthenticated users.
+ * Auth middleware to protect routes
  */
 export default class AuthMiddleware {
   /**
-   * The URL to redirect to, when authentication fails
+   * Handle request
    */
-  redirectTo = '/login'
+  async handle(ctx: HttpContext, next: NextFn) {
+    try {
+      // Authenticate using API tokens guard
+      await ctx.auth.use('api').authenticate()
+      return next()
+    } catch (error) {
+      return ctx.response.unauthorized({ error: 'Authentication required' })
+    }
+  }
+}
 
-  async handle(
-    ctx: HttpContext,
-    next: NextFn,
-    options: {
-      guards?: (keyof Authenticators)[]
-    } = {}
-  ) {
-    await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo })
-    return next()
+/**
+ * Check if user has required role
+ */
+export function checkRole(role: UserRole) {
+  return async (ctx: HttpContext, next: NextFn) => {
+    try {
+      // Authenticate first
+      await ctx.auth.use('api').authenticate()
+      
+      const user = ctx.auth.use('api').user!
+      
+      if (user.role !== role) {
+        return ctx.response.forbidden({ error: 'Insufficient permissions' })
+      }
+      
+      return next()
+    } catch (error) {
+      return ctx.response.unauthorized({ error: 'Authentication required' })
+    }
   }
 }

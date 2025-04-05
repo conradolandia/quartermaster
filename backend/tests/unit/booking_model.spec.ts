@@ -27,7 +27,6 @@ test.group('Booking Model', (group) => {
     mission.salesOpenAt = DateTime.local()
     mission.active = true
     mission.public = true
-    mission.refundCutoffHours = 24
     await mission.save()
     testMissionId = mission.id
   })

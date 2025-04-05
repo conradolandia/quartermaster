@@ -26,6 +26,7 @@ server.use([
   () => import('#middleware/container_bindings_middleware'),
   () => import('#middleware/force_json_response_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
+  () => import('@adonisjs/static/static_middleware'),
 ])
 
 /**
@@ -35,9 +36,14 @@ server.use([
 router.use([() => import('@adonisjs/core/bodyparser_middleware'), () => import('@adonisjs/auth/initialize_auth_middleware')])
 
 /**
- * Named middleware collection must be explicitly assigned to
- * the routes or the routes group.
+ * Http middleware
  */
 export const middleware = router.named({
-  auth: () => import('#middleware/auth_middleware')
+  auth: () => import('#middleware/auth_middleware'),
 })
+
+/**
+ * The application's global middleware stack.
+ * These middleware are run during every request to your application.
+ */
+server.use([])

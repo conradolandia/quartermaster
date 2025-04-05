@@ -35,7 +35,6 @@ test.group('Missions Controller', (group) => {
       sales_open_at: DateTime.local().toISO(),
       active: true,
       public: true,
-      refund_cutoff_hours: 24,
     }
 
     const response = await client.post('/api/v1/missions').json(missionData)
@@ -45,7 +44,6 @@ test.group('Missions Controller', (group) => {
     assert.equal(body.name, 'Test Mission')
     assert.equal(body.active, true)
     assert.equal(body.public, true)
-    assert.equal(body.refundCutoffHours, 24)
     
     // Save mission ID for cleanup
     const missionId = body.id
@@ -63,7 +61,6 @@ test.group('Missions Controller', (group) => {
     mission.salesOpenAt = DateTime.local()
     mission.active = true
     mission.public = true
-    mission.refundCutoffHours = 48
     await mission.save()
     
     const response = await client.get(`/api/v1/missions/${mission.id}`)
@@ -83,7 +80,6 @@ test.group('Missions Controller', (group) => {
     mission.salesOpenAt = DateTime.local()
     mission.active = false
     mission.public = false
-    mission.refundCutoffHours = 12
     await mission.save()
     
     const response = await client.put(`/api/v1/missions/${mission.id}`).json({

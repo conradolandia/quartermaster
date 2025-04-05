@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Trip, { TripType } from '#models/trip'
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
+import { createTripValidator, updateTripValidator } from '#validators/trip_validator'
 
 export default class TripsController {
   /**
@@ -27,23 +28,16 @@ export default class TripsController {
    * Create a new trip
    */
   async store({ request, response }: HttpContext) {
-    const data = request.only([
-      'mission_id',
-      'type',
-      'departure_time',
-      'boarding_time',
-      'check_in_time',
-      'active',
-    ])
+    const payload = await request.validateUsing(createTripValidator)
 
     const trip = await Trip.create({
       id: uuidv4(),
-      missionId: data.mission_id,
-      type: data.type || TripType.LAUNCH_VIEWING,
-      departureTime: data.departure_time ? DateTime.fromISO(data.departure_time) : DateTime.now(),
-      boardingTime: data.boarding_time ? DateTime.fromISO(data.boarding_time) : DateTime.now(),
-      checkInTime: data.check_in_time ? DateTime.fromISO(data.check_in_time) : DateTime.now(),
-      active: data.active !== undefined ? data.active : true,
+      missionId: payload.mission_id,
+      type: payload.type ? payload.type as TripType : TripType.LAUNCH_VIEWING,
+      departureTime: payload.departure_time ? DateTime.fromISO(payload.departure_time) : DateTime.now(),
+      boardingTime: payload.boarding_time ? DateTime.fromISO(payload.boarding_time) : DateTime.now(),
+      checkInTime: payload.check_in_time ? DateTime.fromISO(payload.check_in_time) : DateTime.now(),
+      active: payload.active !== undefined ? payload.active : true,
     })
 
     await trip.load('mission')
@@ -57,21 +51,14 @@ export default class TripsController {
     const { id } = params
     const trip = await Trip.findOrFail(id)
     
-    const data = request.only([
-      'mission_id',
-      'type',
-      'departure_time',
-      'boarding_time',
-      'check_in_time',
-      'active',
-    ])
+    const payload = await request.validateUsing(updateTripValidator)
 
-    trip.missionId = data.mission_id || trip.missionId
-    if (data.type) trip.type = data.type
-    if (data.departure_time) trip.departureTime = DateTime.fromISO(data.departure_time)
-    if (data.boarding_time) trip.boardingTime = DateTime.fromISO(data.boarding_time)
-    if (data.check_in_time) trip.checkInTime = DateTime.fromISO(data.check_in_time)
-    if (data.active !== undefined) trip.active = data.active
+    if (payload.mission_id) trip.missionId = payload.mission_id
+    if (payload.type) trip.type = payload.type as TripType
+    if (payload.departure_time) trip.departureTime = DateTime.fromISO(payload.departure_time)
+    if (payload.boarding_time) trip.boardingTime = DateTime.fromISO(payload.boarding_time)
+    if (payload.check_in_time) trip.checkInTime = DateTime.fromISO(payload.check_in_time)
+    if (payload.active !== undefined) trip.active = payload.active
 
     await trip.save()
     await trip.load('mission')

@@ -24,9 +24,6 @@ export default class Mission extends BaseModel {
   @column()
   declare public: boolean
 
-  @column()
-  declare refundCutoffHours: number
-
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

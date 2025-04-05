@@ -31,7 +31,6 @@ export default class MissionsController {
       'sales_open_at',
       'active',
       'public',
-      'refund_cutoff_hours',
     ])
 
     const mission = await Mission.create({
@@ -41,7 +40,6 @@ export default class MissionsController {
       salesOpenAt: data.sales_open_at,
       active: data.active || false,
       public: data.public || false,
-      refundCutoffHours: data.refund_cutoff_hours || 12,
     })
 
     await mission.load('launch')
@@ -61,7 +59,6 @@ export default class MissionsController {
       'sales_open_at',
       'active',
       'public',
-      'refund_cutoff_hours',
     ])
 
     mission.launchId = data.launch_id || mission.launchId
@@ -69,7 +66,6 @@ export default class MissionsController {
     if (data.sales_open_at) mission.salesOpenAt = data.sales_open_at
     if (data.active !== undefined) mission.active = data.active
     if (data.public !== undefined) mission.public = data.public
-    if (data.refund_cutoff_hours) mission.refundCutoffHours = data.refund_cutoff_hours
 
     await mission.save()
     await mission.load('launch')
