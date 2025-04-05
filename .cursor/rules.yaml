@@ -1,0 +1,145 @@
+############################################################
+# Quartermaster Project Coding Rules
+############################################################
+
+# General naming conventions
+naming:
+  # Use camelCase for variables, methods, and properties
+  variables: camelCase
+  # Use PascalCase for classes, interfaces, types, and enums
+  classes: PascalCase
+  # Use snake_case for database fields
+  database:
+    fields: snake_case
+    tables: snake_case
+  # Use kebab-case for file names and directories
+  files:
+    frontend: kebab-case
+    backend: camelCase
+
+# Project structure
+structure:
+  frontend:
+    components:
+      # Each component should have its own directory when it has multiple files
+      directory_per_component: true
+      # Components should be grouped by feature/module
+      group_by_feature: true
+    # Use barrel exports (index.ts) for component libraries
+    use_barrel_exports: true
+  backend:
+    # Follow AdonisJS directory conventions
+    adonis_conventions: true
+    # Group controllers by resource
+    group_controllers_by_resource: true
+    # Use repositories for database interactions
+    use_repositories: true
+
+# Code style
+style:
+  # Maximum line length
+  max_line_length: 100
+  # Indentation with spaces
+  indentation: 
+    size: 2
+    use_spaces: true
+  # Use single quotes for strings
+  string_quotes: single
+  # Include semicolons
+  semicolons: true
+  # Trailing commas in multiline objects and arrays
+  trailing_comma: true
+  # No unused variables or imports
+  no_unused: true
+  # No console.log in production code
+  no_console_in_production: true
+  # Prefer async/await over promise chains
+  prefer_async_await: true
+  # Prefer explicit return types for functions
+  explicit_return_types: true
+  # Prefer arrow functions for callbacks
+  prefer_arrow_functions: true
+  # Use template literals for string concatenation
+  prefer_template_literals: true
+
+# Documentation
+documentation:
+  # Document public APIs
+  document_public_apis: true
+  # Include JSDoc for component props
+  document_component_props: true
+  # Document database models
+  document_models: true
+  # Use consistent comment style
+  comment_style: 
+    # Use // for single line comments
+    single_line: //
+    # Use /** */ for docblocks
+    docblock: /** */
+
+# Testing
+testing:
+  # Write tests for all business logic
+  test_business_logic: true
+  # Write tests for all API endpoints
+  test_api_endpoints: true
+  # Use descriptive test names
+  descriptive_test_names: true
+  # Include a test for each component
+  test_components: true
+  # Target test coverage percentage
+  coverage_target: 80
+
+# Performance
+performance:
+  # Lazy load routes
+  lazy_load_routes: true
+  # Use code splitting for large bundles
+  use_code_splitting: true
+  # Optimize images
+  optimize_images: true
+  # Minimize database queries
+  minimize_db_queries: true
+  # Use caching where appropriate
+  use_caching: true
+
+# Accessibility
+accessibility:
+  # Use semantic HTML
+  use_semantic_html: true
+  # Include ARIA attributes where needed
+  use_aria_attributes: true
+  # Ensure adequate color contrast
+  adequate_color_contrast: true
+  # Support keyboard navigation
+  keyboard_navigation: true
+
+# Security
+security:
+  # Validate all user input
+  validate_user_input: true
+  # Sanitize data before displaying to users
+  sanitize_output: true
+  # Use CSRF protection
+  use_csrf: true
+  # Use parameterized queries
+  use_parameterized_queries: true
+  # Implement rate limiting
+  implement_rate_limiting: true
+  # Use secure HTTP headers
+  use_secure_headers: true
+
+# Git
+git:
+  # Use conventional commits
+  conventional_commits: true
+  # Keep commits small and focused
+  small_commits: true
+  # Write descriptive commit messages
+  descriptive_commit_messages: true
+  # Branch naming conventions
+  branch_naming:
+    feature: feature/[feature-name]
+    bugfix: bugfix/[bug-description]
+    hotfix: hotfix/[hotfix-description]
+    release: release/[version] 

@@ -1,0 +1,362 @@
+---
+description: Backend development guidelines for the Quartermaster project
+globs: ["**/*.ts", "**/server/**", "**/app/**", "**/database/**"]
+alwaysApply: false
+related_docs: [".cursor/rules/typescript.mdc", ".cursor/rules/coding-standards.mdc"]
+---
+# Backend Rules for Quartermaster Project
+
+@context {
+    "type": "backend_guidelines",
+    "purpose": "cursor_rules",
+    "format_version": "1.0.0"
+}
+
+You are working on the backend of the Quartermaster project, a booking system for Star✦Fleet Tours built with AdonisJS that manages rocket launch viewing trips.
+
+## Tech Stack
+
+@tech_stack {
+    "framework": "AdonisJS 6",
+    "language": "TypeScript",
+    "database": "PostgreSQL",
+    "payment": "Stripe API",
+    "email": "SendGrid"
+}
+
+- **AdonisJS 6**: TypeScript-based Node.js framework
+- **PostgreSQL**: Primary database
+- **Stripe API**: Payment processing
+- **SendGrid**: Email services
+- **TypeScript**: For type safety
+
+## API Design
+
+@api_endpoints {
+    "launches": {
+        "list": "GET /api/v1/launches",
+        "detail": "GET /api/v1/launches/:id"
+    },
+    "missions": {
+        "list": "GET /api/v1/missions",
+        "detail": "GET /api/v1/missions/:id"
+    },
+    "trips": {
+        "list": "GET /api/v1/trips",
+        "detail": "GET /api/v1/trips/:id"
+    },
+    "bookings": {
+        "create": "POST /api/v1/bookings",
+        "detail": "GET /api/v1/bookings/:id",
+        "update": "PATCH /api/v1/bookings/:id",
+        "cancel": "DELETE /api/v1/bookings/:id"
+    },
+    "refunds": {
+        "process": "POST /api/v1/refunds"
+    }
+}
+
+Follow RESTful principles with resource-oriented endpoints:
+
+```
+GET    /api/v1/launches         # List launches
+GET    /api/v1/launches/:id     # Get launch details
+GET    /api/v1/missions         # List missions
+GET    /api/v1/missions/:id     # Get mission details
+GET    /api/v1/trips            # List trips
+GET    /api/v1/trips/:id        # Get trip details
+POST   /api/v1/bookings         # Create booking
+GET    /api/v1/bookings/:id     # Get booking details
+PATCH  /api/v1/bookings/:id     # Update booking
+DELETE /api/v1/bookings/:id     # Cancel booking
+POST   /api/v1/refunds          # Process refund
+```
+
+## Project Structure
+
+@structure {
+    "app": {
+        "controllers": "Handle HTTP requests",
+        "services": "Business logic",
+        "models": "Database models",
+        "validators": "Request validation",
+        "middleware": "HTTP middleware",
+        "exceptions": "Custom exceptions",
+        "repositories": "Data access layer"
+    },
+    "config": "Configuration files",
+    "database": {
+        "migrations": "Database migrations",
+        "seeders": "Seed data"
+    },
+    "start": "App bootstrap files",
+    "tests": "Test files"
+}
+
+Follow AdonisJS conventions with added layers:
+
+```
+app/
+├── controllers/            # Handle HTTP requests
+│   ├── launches_controller.ts
+│   ├── missions_controller.ts
+│   ├── trips_controller.ts
+│   ├── bookings_controller.ts
+│   └── refunds_controller.ts
+├── services/               # Business logic
+│   ├── booking_service.ts
+│   ├── payment_service.ts
+│   ├── email_service.ts
+│   └── refund_service.ts
+├── models/                 # Database models
+│   ├── launch.ts
+│   ├── mission.ts
+│   ├── trip.ts
+│   ├── booking.ts
+│   └── booking_item.ts
+├── validators/             # Request validation
+├── middleware/             # HTTP middleware
+├── exceptions/             # Custom exceptions
+└── repositories/           # Data access layer
+config/                     # Configuration files
+database/
+├── migrations/             # Database migrations
+└── seeders/                # Seed data
+start/                      # App bootstrap files
+tests/                      # Test files
+```
+
+## Coding Patterns
+
+@patterns {
+    "controllers": "Thin controllers with dependency injection",
+    "services": "Business logic in stateless services",
+    "repositories": "Data access abstraction",
+    "models": "Clear relationships and validation"
+}
+
+### Controllers
+
+@controller_guidelines [
+    "Keep controllers thin",
+    "Use dependency injection for services",
+    "Return consistent response formats",
+    "Handle errors with try/catch and appropriate HTTP status codes"
+]
+
+Example controller:
+
+```typescript
+import { HttpContext } from '@adonisjs/core/http'
+import BookingService from '#services/booking_service'
+
+export default class BookingsController {
+  constructor(private bookingService: BookingService) {}
+
+  async store({ request, response }: HttpContext) {
+    try {
+      const data = request.validated()
+      const booking = await this.bookingService.createBooking(data)
+      return response.created(booking)
+    } catch (error) {
+      return this.handleError(error, response)
+    }
+  }
+
+  private handleError(error: any, response: any) {
+    if (error.code === 'VALIDATION_ERROR') {
+      return response.unprocessableEntity(error.messages)
+    }
+    
+    if (error.code === 'NOT_FOUND') {
+      return response.notFound({ message: error.message })
+    }
+    
+    // Log the error here
+    return response.internalServerError({ 
+      message: 'An unexpected error occurred' 
+    })
+  }
+}
+```
+
+### Services
+
+@service_guidelines [
+    "Implement business logic in services",
+    "Create single-responsibility services",
+    "Services should be stateless",
+    "Use typed parameters and return values"
+]
+
+Example service:
+
+```typescript
+import { inject } from '@adonisjs/core'
+import Launch from '#models/launch'
+import Mission from '#models/mission'
+import Booking from '#models/booking'
+import BookingItem from '#models/booking_item'
+import PaymentService from './payment_service'
+import EmailService from './email_service'
+import { BookingCreationDto } from '#dtos/booking_dto'
+
+@inject()
+export default class BookingService {
+  constructor(
+    private paymentService: PaymentService,
+    private emailService: EmailService
+  ) {}
+
+  async createBooking(data: BookingCreationDto): Promise<Booking> {
+    const mission = await Mission.findOrFail(data.missionId)
+    
+    // Check availability
+    await this.validateAvailability(mission, data)
+    
+    // Create booking record
+    const booking = await Booking.create({
+      customerEmail: data.email,
+      customerName: data.name,
+      phoneNumber: data.phone,
+      status: 'pending_payment'
+    })
+    
+    // Create booking items
+    await this.createBookingItems(booking, data.items)
+    
+    // Process payment
+    const paymentResult = await this.paymentService.processPayment(booking, data.paymentToken)
+    
+    // Update booking status
+    if (paymentResult.success) {
+      booking.status = 'confirmed'
+      await booking.save()
+      
+      // Send confirmation email
+      await this.emailService.sendBookingConfirmation(booking)
+    }
+    
+    return booking
+  }
+  
+  private async validateAvailability(mission: Mission, data: BookingCreationDto): Promise<void> {
+    // Implementation to check availability
+  }
+  
+  private async createBookingItems(booking: Booking, items: any[]): Promise<BookingItem[]> {
+    // Implementation to create booking items
+    return []
+  }
+}
+```
+
+## Database Models
+
+@model_guidelines [
+    "Define explicit relationships between models",
+    "Use migrations for all schema changes",
+    "Write proper database indices for performance",
+    "Use snake_case for database fields",
+    "Include appropriate validation rules"
+]
+
+Example model:
+
+```typescript
+import { DateTime } from 'luxon'
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import Mission from './mission'
+import BookingItem from './booking_item'
+
+export default class Booking extends BaseModel {
+  @column({ isPrimary: true })
+  declare id: number
+
+  @column()
+  declare customer_name: string
+
+  @column()
+  declare customer_email: string
+
+  @column()
+  declare phone_number: string | null
+
+  @column()
+  declare status: 'pending_payment' | 'confirmed' | 'checked_in' | 'completed' | 'cancelled' | 'refunded'
+
+  @column()
+  declare mission_id: number
+
+  @column()
+  declare payment_intent_id: string | null
+
+  @column()
+  declare refund_id: string | null
+  
+  @column()
+  declare refund_reason: string | null
+
+  @column.dateTime({ autoCreate: true })
+  declare created_at: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updated_at: DateTime
+
+  @belongsTo(() => Mission)
+  declare mission: BelongsTo<typeof Mission>
+
+  @hasMany(() => BookingItem)
+  declare items: HasMany<typeof BookingItem>
+}
+```
+
+## Error Handling
+
+@error_handling {
+    "custom_exceptions": "Create custom exception classes",
+    "http_exceptions": "Use HTTP-specific exceptions",
+    "logging": "Log detailed error information",
+    "user_messages": "Return user-friendly error messages",
+- Create custom exception classes
+- Use HTTP-specific exceptions
+- Log detailed error information
+- Return user-friendly error messages
+- Include error codes for frontend handling
+
+### Security
+
+- Validate all user input
+- Use parameterized queries for database access
+- Implement proper authentication and authorization
+- Use CSRF protection
+- Set appropriate security headers
+- Rate limit sensitive endpoints
+- Follow OWASP security practices
+
+### Testing
+
+- Write unit tests for services and utilities
+- Write integration tests for API endpoints
+- Test happy paths and edge cases
+- Use mock objects for external dependencies
+- Aim for high test coverage for business logic
+
+### Performance
+
+- Optimize database queries
+- Use database indices appropriately
+- Implement caching for frequently accessed data
+- Use pagination for large data sets
+- Optimize API responses (select only needed fields)
+
+### Deployment
+
+- Use environment variables for configuration
+- Implement health check endpoints
+- Use database migrations for schema changes
+- Follow CI/CD best practices
+- Include proper logging for production troubleshooting 
+
+

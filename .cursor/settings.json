@@ -1,0 +1,105 @@
+{
+  "formatOnSave": true,
+  "editor": {
+    "tabSize": 2,
+    "insertSpaces": true,
+    "detectIndentation": true,
+    "trimTrailingWhitespace": true,
+    "insertFinalNewline": true
+  },
+  "typescript": {
+    "preferences": {
+      "quoteStyle": "single",
+      "importModuleSpecifierPreference": "relative"
+    }
+  },
+  "javascript": {
+    "preferences": {
+      "quoteStyle": "single"
+    }
+  },
+  "workbench": {
+    "colorCustomizations": {
+      "statusBar.background": "#2c3e50",
+      "statusBar.foreground": "#ecf0f1",
+      "statusBarItem.hoverBackground": "#34495e"
+    }
+  },
+  "files.associations": {
+    "*.edge": "html",
+    "*.svelte": "svelte",
+    "*.astro": "astro"
+  },
+  "search.exclude": {
+    "node_modules": true,
+    "build": true,
+    "dist": true,
+    "tmp": true
+  },
+  "git.ignoredRepositories": [
+    "node_modules"
+  ],
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.test.ts",
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "*.component.ts": "${capture}.component.html, ${capture}.component.spec.ts, ${capture}.component.css, ${capture}.component.scss",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml"
+  },
+  "codeActions": {
+    "source.fixAll.eslint": true
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "printWidth": 100,
+    "bracketSpacing": true,
+    "arrowParens": "avoid"
+  },
+  "tailwindCSS.includeLanguages": {
+    "svelte": "html",
+    "astro": "html"
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "svelte",
+    "astro"
+  ],
+  "database.connections": {
+    "quartermaster": {
+      "type": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database": "quartermaster",
+      "username": "postgres",
+      "password": "postgres"
+    }
+  },
+  "folders": [
+    {
+      "name": "Backend",
+      "path": "quartermaster-backend"
+    },
+    {
+      "name": "Frontend",
+      "path": "quartermaster-frontend"
+    },
+    {
+      "name": "Documentation",
+      "path": "quartermaster-docs"
+    }
+  ],
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "svelte.svelte-vscode",
+    "astro-build.astro-vscode",
+    "bradlc.vscode-tailwindcss",
+    "mikestead.dotenv",
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg"
+  ]
+} 

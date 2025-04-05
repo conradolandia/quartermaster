@@ -1,0 +1,142 @@
+---
+description: TypeScript coding standards for the Quartermaster project
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: false
+related_docs: [".cursor/rules/coding-standards.mdc"]
+---
+# TypeScript Standards for Quartermaster
+
+@context {
+    "type": "coding_standards",
+    "language": "typescript",
+    "purpose": "cursor_rules",
+    "format_version": "1.0.0"
+}
+
+This document outlines TypeScript standards for the Quartermaster project.
+
+## Project Structure
+
+@structure {
+    "repositories": [
+        "quartermaster-backend",
+        "quartermaster-frontend",
+        "quartermaster-docs"
+    ]
+}
+
+The project follows a structured architecture with separate repositories:
+- `quartermaster-backend`: AdonisJS backend (TypeScript)
+- `quartermaster-frontend`: Astro + Svelte frontend (TypeScript)
+- `quartermaster-docs`: Project documentation
+
+## TypeScript Standards
+
+@rules [
+    {
+        "id": "strict_mode",
+        "severity": "error",
+        "description": "Use TypeScript strict mode"
+    },
+    {
+        "id": "explicit_return_types",
+        "severity": "warning",
+        "description": "Explicitly define return types for functions"
+    },
+    {
+        "id": "avoid_any",
+        "severity": "warning",
+        "description": "Avoid using 'any' - use appropriate type guards or 'unknown' instead"
+    }
+]
+
+- Use TypeScript strict mode (`"strict": true` in tsconfig.json)
+- Explicitly define return types for functions
+- Prefer interfaces for object shapes, especially for public APIs
+- Use type aliases for complex types, unions, and intersections
+- Create descriptive, semantic type names
+- Use readonly properties when appropriate
+- Avoid using `any` - use appropriate type guards or `unknown` instead
+- Leverage built-in utility types like `Partial<T>`, `Required<T>`, `Pick<T>`, `Omit<T>`
+- Use `as const` for literal values that shouldn't change
+
+## Naming Conventions
+
+@conventions {
+    "interfaces": "PascalCase",
+    "types": "PascalCase",
+    "classes": "PascalCase",
+    "typeParameters": "PascalCase",
+    "variables": "camelCase",
+    "functions": "camelCase",
+    "properties": "camelCase",
+    "methods": "camelCase",
+    "constants": "UPPER_SNAKE_CASE",
+    "propsInterfaces": "Prefix with 'Props'",
+    "interfaceImplementations": "Prefix with 'I'",
+    "typeGuards": "Suffix with 'is'"
+}
+
+- Use PascalCase for interfaces, types, classes, and type parameters
+- Use camelCase for variables, functions, properties, and method names
+- Use UPPER_SNAKE_CASE for constants
+- Use dot notation for namespaces if needed
+- Prefix interfaces used for props with 'Props' (e.g., `ButtonProps`)
+- Prefix interface implementations with 'I' (e.g., `IUserService`)
+- Suffix type guards with 'is' (e.g., `isAdmin`)
+
+## Type Definitions
+
+@best_practices {
+    "type_files": "Create dedicated type files for related types",
+    "type_exports": "Export types from a central index file when appropriate",
+    "type_documentation": "Document complex types with JSDoc comments"
+}
+
+- Create dedicated type files for related types
+- Export types from a central index file when appropriate
+- Use module augmentation for extending third-party libraries
+- Define enums for sets of related constants
+- Document complex types with JSDoc comments
+
+## Type Safety Practices
+
+- Use nullish coalescing (`??`) and optional chaining (`?.`)
+- Use non-null assertion (`!`) only when you can guarantee non-nullability
+- Use type guards to narrow types in conditional logic
+- Prefer type inference where reasonable
+- Implement error handling with typed error objects
+- Add indexing signatures when needed
+- Use generics for reusable components and functions
+
+## Backend TypeScript (AdonisJS)
+
+- Follow AdonisJS naming conventions
+- Define proper model interfaces with relationships
+- Use DTOs for data validation
+- Leverage TypeScript to define repository interfaces
+- Use dependency injection with types
+- Define error types and validation schemas
+
+## Frontend TypeScript (Svelte)
+
+- Define component props with TypeScript interfaces
+- Use type definitions for component events
+- Use TypeScript for state management
+- Keep business logic and types in separate files
+- Define API response types to match backend DTOs
+- Use TypeScript for form validation schemas
+
+## Best Practices
+
+@examples {
+    "discriminated_union": "```typescript\ntype Result<T> = \n  | { status: 'success'; data: T }\n  | { status: 'error'; error: Error };\n```",
+    "type_guard": "```typescript\nfunction isBooking(obj: unknown): obj is Booking {\n  return obj !== null && typeof obj === 'object' && 'confirmationCode' in obj;\n}\n```"
+}
+
+- Avoid type casting where possible
+- Keep types DRY - don't repeat type definitions
+- Use discriminated unions for complex type variations
+- Properly type asynchronous code with Promises
+- Write unit tests that also verify types
+- Update types when requirements change 

@@ -1,0 +1,147 @@
+---
+description: Main project guidelines for the Star✦Fleet Tours Quartermaster booking system
+globs: ["**/*"]
+alwaysApply: true
+---
+# Quartermaster Project Rules
+
+@context {
+    "type": "project_guidelines",
+    "purpose": "cursor_rules",
+    "format_version": "1.0.0"
+}
+
+This is the main rules file for the Quartermaster project, a booking system for Star✦Fleet Tours allowing users to book tickets for rocket launch viewing trips.
+
+## Related Documentation
+
+- [Domain Knowledge](mdc:.cursor/rules/domain.mdc)
+- [TypeScript Standards](mdc:.cursor/rules/typescript.mdc)
+- [Frontend Guidelines](mdc:.cursor/rules/frontend.mdc)
+- [Backend Guidelines](mdc:.cursor/rules/backend.mdc)
+- [Coding Standards](mdc:.cursor/rules/coding-standards.mdc)
+
+## Project Principles
+
+@principles [
+    "User-Centered Design: Prioritize the user experience in all decisions",
+    "Maintainable Code: Write clean, well-documented code for long-term maintenance", 
+    "Performance First: Optimize for speed and efficiency",
+    "Progressive Enhancement: Build core functionality first, then enhance",
+    "Mobile-First: Design for mobile devices first, then adapt for larger screens"
+]
+
+## Coding Requirements
+
+@requirements [
+    {
+        "id": "typescript",
+        "description": "All code must be typed using TypeScript",
+        "severity": "error"
+    },
+    {
+        "id": "architecture",
+        "description": "Follow the established project architecture",
+        "severity": "error"
+    },
+    {
+        "id": "testing",
+        "description": "Include comprehensive unit tests for all business logic",
+        "severity": "warning"
+    },
+    {
+        "id": "documentation",
+        "description": "Document all public APIs and interfaces",
+        "severity": "warning"
+    },
+    {
+        "id": "commits",
+        "description": "Use atomic commits with descriptive messages",
+        "severity": "info"
+    },
+    {
+        "id": "versioning",
+        "description": "Follow semantic versioning for releases",
+        "severity": "warning"
+    }
+]
+
+## Development Process
+
+@process [
+    "Feature Planning: Define requirements and acceptance criteria",
+    "Implementation: Develop and test the feature",
+    "Code Review: Peer review of all code changes",
+    "QA Testing: Test in staging environment",
+    "Deployment: Release to production",
+    "Monitoring: Track performance and errors"
+]
+
+## Performance Targets
+
+@performance {
+    "initial_page_load": "< 2 seconds",
+    "time_to_interactive": "< 3 seconds",
+    "api_response_time": "< 500ms",
+    "lighthouse_score": "> 90"
+}
+
+## Accessibility Requirements
+
+@accessibility [
+    "Meet WCAG 2.1 AA standards",
+    "Ensure keyboard navigation",
+    "Support screen readers",
+    "Maintain proper color contrast",
+    "Provide alternative text for images"
+]
+
+## Security Standards
+
+@security [
+    "Sanitize all user input",
+    "Protect against XSS and CSRF attacks",
+    "Implement proper authentication and authorization",
+    "Use HTTPS for all connections",
+    "Follow security best practices for handling payments"
+]
+
+## Code Quality
+
+@code_quality {
+    "test_coverage": "at least 80%",
+    "linting": "Zero errors allowed",
+    "dependencies": "Regular updates",
+    "documentation": "Required for complex logic",
+    "style": "Consistent, enforced by tools"
+}
+
+## Collaboration Guidelines
+
+@collaboration [
+    "Open and respectful communication",
+    "Document decisions and rationales",
+    "Share knowledge and learnings",
+    "Provide constructive feedback",
+    "Focus on solutions, not blame"
+]
+
+## API Design
+
+@api_design [
+    "Follow RESTful principles",
+    "Use semantic HTTP methods",
+    "Return appropriate status codes",
+    "Document all endpoints",
+    "Version all APIs"
+]
+
+## Database Practices
+
+@database [
+    "Use migrations for all schema changes",
+    "Write proper indices for performance",
+    "Document all tables and relationships",
+    "Validate data before insertion",
+    "Implement proper error handling"
+] 

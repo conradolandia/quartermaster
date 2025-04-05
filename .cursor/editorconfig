@@ -1,0 +1,55 @@
+# EditorConfig for Quartermaster Project
+# https://editorconfig.org/
+
+# top-most EditorConfig file
+root = true
+
+# Default settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 100
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# TypeScript files
+[*.{ts,tsx}]
+quote_type = single
+
+# JavaScript files
+[*.{js,jsx}]
+quote_type = single
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_size = 2
+
+# HTML, Edge, Svelte, and Astro files
+[*.{html,edge,svelte,astro}]
+indent_size = 2
+
+# CSS, SCSS files
+[*.{css,scss}]
+indent_size = 2
+
+# SQL files
+[*.sql]
+indent_size = 2
+
+# Shell scripts
+[*.sh]
+indent_size = 2
+
+# Config files
+[{package.json,.travis.yml}]
+indent_size = 2 

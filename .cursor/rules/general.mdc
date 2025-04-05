@@ -1,0 +1,46 @@
+---
+description: General guidelines for the Star✦Fleet Tours Quartermaster booking system
+globs: ["**/*"]
+alwaysApply: true
+---
+# Quartermaster Project - Star✦Fleet Tours Booking System
+
+@context {
+    "type": "project_overview",
+    "purpose": "cursor_rules",
+    "format_version": "1.0.0"
+}
+
+You are working on the Quartermaster project, a booking system for Star✦Fleet Tours that allows customers to book tickets for rocket launch viewing trips.
+
+This cursorrules file defines how AI should assist with the Quartermaster project development.
+
+## Project Context
+
+Quartermaster is a comprehensive booking system allowing customers to book tickets for rocket launch viewing trips. The system manages the entire customer journey from discovery to check-in, handles payments, and provides administrative tools.
+
+## Key Features
+
+- Mission and trip management for rocket launches
+- Multi-step booking flow with Stripe integration
+- QR code tickets for check-in
+- Admin dashboard for operations
+- Refund processing system
+- Detailed reporting and analytics
+
+## Tech Stack
+
+- Frontend: Astro + Svelte + TypeScript + Tailwind CSS + Shadcn
+- Backend: AdonisJS + TypeScript + PostgreSQL
+- Infrastructure: VPS hosting with Docker
+- External: Stripe (payments), SendGrid (email)
+
+## Related Documentation
+
+When developing this project, follow the standards and conventions described in:
+
+- [Domain Knowledge](mdc:.cursor/rules/domain.mdc)
+- [TypeScript Standards](mdc:.cursor/rules/typescript.mdc)
+- [Frontend Guidelines](mdc:.cursor/rules/frontend.mdc)
+- [Backend Guidelines](mdc:.cursor/rules/backend.mdc)
+- [Coding Standards](mdc:.cursor/rules/coding-standards.mdc) 

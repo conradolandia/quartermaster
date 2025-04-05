@@ -1,0 +1,103 @@
+---
+description: Coding standards and practices for the Quartermaster project
+globs: ["**/*"]
+related_docs: [".cursor/rules/typescript.mdc", ".cursor/rules/frontend.mdc", ".cursor/rules/backend.mdc"]
+---
+# Coding Standards for Quartermaster
+
+@context {
+    "type": "coding_standards",
+    "purpose": "cursor_rules",
+    "format_version": "1.0.0"
+}
+
+This document outlines the coding standards and practices for the Quartermaster project.
+
+## General Principles
+
+@principles [
+    "User-Centered Design: Every development decision should prioritize the user experience",
+    "Maintainable Code: Write clean, well-documented code with future maintenance in mind",
+    "Performance First: Optimize for speed and efficiency at all levels",
+    "Progressive Enhancement: Build core functionality first, then enhance",
+    "Mobile-First: Always design for mobile devices first, then adapt for larger screens"
+]
+
+## Common Standards
+
+@standards {
+    "language": "TypeScript with strict type checking enabled",
+    "formatting": "Consistent code formatting with Prettier",
+    "indentation": "2 spaces",
+    "line_length": "100 characters maximum",
+    "strings": "Single quotes",
+    "statements": "Semi-colons required",
+    "naming": "Meaningful variable and function names",
+    "documentation": "JSDoc comments for public interfaces"
+}
+
+## Git Workflow
+
+@git {
+    "branches": {
+        "feature": "feature/description",
+        "bugfix": "bugfix/description",
+        "hotfix": "hotfix/description"
+    },
+    "commits": "Clear and descriptive messages",
+    "merge_strategy": "Rebase feature branches on develop before merging",
+    "code_review": "At least one approval required",
+    "squash": "Squash commits when merging to develop"
+}
+
+## Code Quality
+
+@quality {
+    "test_coverage": "At least 80%",
+    "linting": "Zero errors in committed code",
+    "dependencies": "Regular updates required",
+    "documentation": "Required for complex logic",
+    "patterns": "Use appropriate design patterns"
+}
+
+## Security Standards
+
+@security [
+    "Sanitize all user input",
+    "Prevent XSS and CSRF attacks",
+    "Implement proper authentication and authorization",
+    "Use HTTPS for all connections",
+    "Follow security best practices for handling payments",
+    "Regular security audits"
+]
+
+## Accessibility Requirements
+
+@accessibility {
+    "standards": "WCAG 2.1 AA",
+    "keyboard": "Ensure keyboard navigation",
+    "screen_readers": "Support all major screen readers",
+    "contrast": "At least 4.5:1 ratio",
+    "alt_text": "Provide for all images"
+}
+
+## Performance Targets
+
+@performance {
+    "initial_load": "< 2 seconds",
+    "interactive": "< 3 seconds",
+    "api_response": "< 500ms",
+    "lighthouse": "> 90",
+    "assets": "Optimize images and assets",
+    "requests": "Minimize HTTP requests"
+}
+
+## Error Handling
+
+@error_handling [
+    "Use custom exception classes",
+    "Log errors with appropriate context",
+    "Return user-friendly error messages",
+    "Include error codes for frontend handling",
+    "Fail gracefully with helpful recovery options"
+] 

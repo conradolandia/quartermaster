@@ -1,0 +1,170 @@
+---
+description: Domain knowledge for the Star✦Fleet Tours Quartermaster booking system
+globs: ["**/*"]
+related_docs: [".cursor/rules/general.mdc"]
+---
+# Quartermaster Domain Knowledge
+
+@context {
+    "type": "domain_knowledge",
+    "purpose": "cursor_rules",
+    "format_version": "1.0.0"
+}
+
+This document outlines key domain knowledge for the Quartermaster project, a booking system for Star✦Fleet Tours.
+
+## Core Business Entities
+
+@entities {
+    "launch": "A physical rocket launch event",
+    "mission": "Star✦Fleet Tours' organized viewing opportunity",
+    "trip": "A specific boat excursion within a mission",
+    "booking": "A customer's reservation record",
+    "bookingItem": "Individual line items within a booking"
+}
+
+### Launch
+- A physical rocket launch event (e.g., "SpaceX Starship Flight 9")
+- Properties: date, time, launch provider, vehicle type, status
+- May be rescheduled or scrubbed (cancelled)
+- Each launch attempt has its own unique ID
+
+### Mission
+- Star✦Fleet Tours' organized viewing opportunity for a launch
+- Properties: name, description, dates, capacity, pricing
+- May span multiple days (pre-launch and launch day)
+- Associated with exactly one launch attempt
+- Identified by a URL slug (mission-slug)
+
+### Trip
+- A specific boat excursion within a mission
+- Properties: date, time, capacity, duration, boat name
+- Types: pre-launch (reconnaissance) or launch-day
+- Each mission typically has 1-3 trips
+
+### Booking
+- A customer's reservation record
+- Contains customer information, payment details, and items
+- Status: pending_payment, confirmed, checked_in, completed, cancelled, refunded
+- Identified by a booking reference code
+- Manages the lifecycle of a customer's purchase
+
+### Booking Item
+- Individual line items within a booking
+- Can be tickets, merchandise, or add-ons
+- Properties: quantity, price, and item type
+- Each item has its own status that can change independently
+- Item statuses: active, fulfilled, refunded
+
+## Business Rules
+
+@rules {
+    "booking_process": "Step-by-step process of creating a booking",
+    "capacity_management": "How system manages available seats",
+    "refund_policy": "Guidelines for processing refunds",
+    "check_in_process": "How customers are checked in for trips"
+}
+
+### Booking Process
+1. Customer selects a mission
+2. Customer chooses ticket quantities and optional add-ons
+3. Customer enters personal information
+4. Customer completes payment via Stripe
+5. System confirms booking and sends confirmation email
+6. QR code is generated for check-in
+
+### Capacity Management
+- Each trip has a maximum capacity
+- Capacity is tracked in real-time
+- When a booking is made, capacity is reduced
+- When a booking is cancelled, capacity is restored
+- Admin can override capacity limits
+
+### Refund Policy
+- Full refunds available up to 7 days before launch
+- Partial refunds (50%) available 3-7 days before launch
+- No refunds within 3 days of launch
+- Refund reasons tracked for reporting (e.g., "change in party size", "could not make date")
+- Authorized admin can override refund policy
+
+### Check-in Process
+- Staff uses admin portal to scan QR code
+- Each booking has a unique QR code
+- Check-in is per-booking, not per-person
+- QR code contains a URL with the booking ID
+- System validates booking against selected trip/boat context
+- On successful validation, system updates item status to "fulfilled"
+
+## Integration Points
+
+@integrations {
+    "stripe": "Payment processing",
+    "email": "Customer communications"
+}
+
+### Stripe
+- Used for payment processing
+- Handles credit card processing and refunds
+- Stores payment methods securely
+- Provides payment receipts
+
+### Email System
+- Sends booking confirmations
+- Delivers QR codes for check-in
+- Sends booking reminders
+- Notifies about launch schedule changes
+- Uses SendGrid for delivery
+
+## Customer Journey
+
+@journey [
+    "Discovery: Customer finds mission through website or social media",
+    "Selection: Customer chooses specific mission and trip",
+    "Booking: Customer completes reservation process",
+    "Pre-trip: Customer receives confirmation and trip details",
+    "Check-in: Customer arrives and gets checked in via QR code",
+    "Experience: Customer enjoys the launch viewing",
+    "Follow-up: Customer receives thank you email and feedback request"
+]
+
+## Admin Operations
+
+@operations [
+    "Mission creation and management",
+    "Inventory and capacity adjustment",
+    "Booking management and search",
+    "Check-in processing",
+    "Refund handling",
+    "Reporting and analytics"
+]
+
+## Common Scenarios
+
+@scenarios {
+    "launch_rescheduling": "How system handles launch date changes",
+    "capacity_adjustments": "How system manages boat capacity changes"
+}
+
+### Launch Rescheduling
+- When a launch is rescheduled, the associated mission dates may change
+- Customers are notified of changes
+- Customers can request a refund if they can't attend the new date
+- Admin can manage mass communications for schedule changes
+
+### Capacity Adjustments
+- Admin can adjust trip capacity based on boat availability
+- If capacity is reduced, existing bookings are protected
+- If a trip is cancelled, customers are offered alternatives or refunds
+
+## Common Terms and Acronyms
+
+@terminology {
+    "scrub": "Cancellation of a launch attempt",
+    "static_fire": "Engine test before launch",
+    "net": "No Earlier Than (for launch dates)",
+    "l_days": "Launch minus X days (L-1, L-2, etc.)",
+    "recon": "Reconnaissance (pre-launch trip)",
+    "pax": "Passengers",
+    "adt": "Adult ticket",
+    "chd": "Child ticket"
+} 

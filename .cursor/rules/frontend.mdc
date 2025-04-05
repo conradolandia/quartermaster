@@ -1,0 +1,205 @@
+---
+description: Frontend development guidelines for the Quartermaster project
+globs: ["**/*.astro", "**/*.svelte", "**/*.ts", "**/*.tsx", "**/*.css"]
+alwaysApply: false
+related_docs: [".cursor/rules/typescript.mdc", ".cursor/rules/coding-standards.mdc"]
+---
+# Frontend Rules for Quartermaster Project
+
+@context {
+    "type": "frontend_guidelines",
+    "purpose": "cursor_rules",
+    "format_version": "1.0.0"
+}
+
+You are working on the frontend of the Quartermaster project, a booking system built with Astro and Svelte that allows customers to book tickets for rocket launch viewing trips.
+
+## Tech Stack
+
+@tech_stack {
+    "main_framework": "Astro",
+    "ui_framework": "Svelte 5",
+    "component_library": "Shadcn-svelte",
+    "css_framework": "Tailwind CSS",
+    "language": "TypeScript"
+}
+
+- **Astro**: Main framework for static site generation and page routing
+- **Svelte 5**: UI component framework with reactive capabilities
+- **Shadcn-svelte**: UI component library based on Tailwind
+- **Tailwind CSS**: Utility-first CSS framework
+- **TypeScript**: For type safety
+
+## Component Structure
+
+@implementation {
+    "language": "svelte",
+    "structure": "script-template-style",
+    "types": "TypeScript"
+}
+
+For Svelte components:
+```svelte
+<script lang="ts">
+  // Imports at the top
+  import { onMount } from 'svelte';
+  
+  // Props with explicit types
+  export let propName: string;
+  export let count: number = 0; // Default value
+  
+  // Local state
+  let localState = '';
+  
+  // Reactive statements
+  $: derivedValue = count * 2;
+  
+  // Methods
+  function handleClick() {
+    count += 1;
+  }
+  
+  // Lifecycle
+  onMount(() => {
+    // Initialize component
+  });
+</script>
+
+<!-- Template with minimal logic -->
+<div class="component-wrapper">
+  <h2>{propName}</h2>
+  <p>Count: {count}</p>
+  <p>Derived: {derivedValue}</p>
+  <button on:click={handleClick}>Increment</button>
+</div>
+
+<style>
+  /* Scoped styles (use Tailwind classes preferably) */
+  .component-wrapper {
+    /* Only include styles that can't be easily handled by Tailwind */
+  }
+</style>
+```
+
+## Folder Structure
+
+@structure {
+    "components": {
+        "booking": "Booking flow components",
+        "admin": "Admin dashboard components",
+        "common": "Shared components",
+        "ui": "Basic UI components (shadcn)"
+    },
+    "layouts": "Page layouts",
+    "pages": "Astro pages",
+    "lib": {
+        "api": "API client functions",
+        "types": "TypeScript types and interfaces",
+        "utils": "Helper functions",
+        "stores": "Svelte stores"
+    },
+    "styles": "Global styles"
+}
+
+```
+src/
+├── components/
+│   ├── booking/        # Booking flow components
+│   ├── admin/          # Admin dashboard components
+│   ├── common/         # Shared components
+│   └── ui/             # Basic UI components (shadcn)
+├── layouts/            # Page layouts
+├── pages/              # Astro pages
+├── lib/                # Shared utilities
+│   ├── api/            # API client functions
+│   ├── types/          # TypeScript types and interfaces
+│   ├── utils/          # Helper functions
+│   └── stores/         # Svelte stores
+└── styles/             # Global styles
+```
+
+## Styling Guidelines
+
+@styling [
+    "Use Tailwind CSS for styling whenever possible",
+    "Use CSS variables for theming (colors, spacing, etc.)",
+    "Follow mobile-first responsive design",
+    "Ensure adequate color contrast for accessibility",
+    "Keep components responsive with appropriate breakpoints",
+    "Use semantic HTML elements"
+]
+
+## Form Guidelines
+
+@forms [
+    "Use proper form validation with clear error messages",
+    "Show inline validation feedback",
+    "Use appropriate input types (email, tel, number, etc.)",
+    "Provide clear labels for all form fields",
+    "Support keyboard navigation and tab order",
+    "Implement accessible error states",
+    "Include loading states for form submission"
+]
+
+## API Interaction
+
+@api {
+    "organization": "Create dedicated API client functions in lib/api",
+    "typing": "Use TypeScript interfaces for request/response types",
+    "error_handling": "Implement proper error handling",
+    "loading_states": "Show loading states during API calls",
+    "optimistic_updates": "Use optimistic UI updates where appropriate",
+    "retry": "Implement retry logic for failed requests"
+}
+
+## State Management
+
+@state [
+    "Use Svelte stores for shared state",
+    "Keep component state local when possible",
+    "Use derived stores for computed values",
+    "Pass stores to components that need them"
+]
+
+## Performance
+
+@performance [
+    "Lazy load components when appropriate",
+    "Use code splitting for routes",
+    "Optimize images with appropriate formats and sizes",
+    "Minimize JavaScript bundle size",
+    "Use passive event listeners for scroll events",
+    "Implement debounce/throttle for frequent events"
+]
+
+## Accessibility
+
+@accessibility [
+    "Follow WCAG 2.1 AA standards",
+    "Use semantic HTML",
+    "Include proper ARIA attributes",
+    "Support keyboard navigation",
+    "Ensure proper focus management for modals",
+    "Test with screen readers",
+    "Maintain appropriate color contrast"
+]
+
+## Testing
+
+@testing [
+    "Write unit tests for utility functions",
+    "Write component tests for complex components",
+    "Test edge cases and error states",
+    "Test accessibility with automated tools"
+]
+
+## Booking Flow Best Practices
+
+@booking_flow [
+    "Keep the form simple and focused",
+    "Show clear progress indicators",
+    "Provide helpful validation messages",
+    "Make error recovery easy",
+    "Display a clear summary before payment",
+    "Ensure the confirmation page is comprehensive"
+]

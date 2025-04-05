@@ -1,0 +1,81 @@
+# Editor directories and files
+_*
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+*.tmp
+*.tmp.*
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.idea/
+.DS_Store
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+.pnpm-store/
+.npm/
+.yarn/
+
+# AdonisJS specific
+build/
+tmp/
+.env
+.env.local
+.env.production
+.env.development
+.env.testing
+.env.bak
+api_token.txt
+coverage/
+.nyc_output
+
+# Astro & Svelte specific
+dist/
+.astro/
+.svelte-kit/
+.cache/
+.output/
+
+# PostgreSQL
+*.dump
+*.sql
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Testing
+/cypress/videos/
+/cypress/screenshots/
+/playwright-report/
+/test-results/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Stripe CLI local configuration
+.stripe/
