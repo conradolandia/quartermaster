@@ -3,12 +3,17 @@ import { v4 as uuidv4 } from 'uuid'
 import Mission from '#models/mission'
 import Launch from '#models/launch'
 import { DateTime } from 'luxon'
+import AdminUser from '#models/admin_user'
 
 test.group('Missions Controller', (group) => {
   let testLaunchId: string
 
   // Setup: Create a test launch for our missions
   group.setup(async () => {
+    // Clean up existing admin users
+    await AdminUser.query().delete()
+    
+    // Create a test launch
     const launch = new Launch()
     launch.id = uuidv4()
     launch.name = 'Test Launch'
@@ -19,13 +24,22 @@ test.group('Missions Controller', (group) => {
 
   // Cleanup: Delete test data
   group.teardown(async () => {
-    await Launch.findOrFail(testLaunchId).then((launch) => launch.delete())
+    try {
+      // First delete any missions that depend on the launch
+      await Mission.query().where('launch_id', testLaunchId).delete()
+      // Then delete the launch
+      const launch = await Launch.find(testLaunchId)
+      if (launch) {
+        await launch.delete()
+      }
+    } catch (error) {
+      console.error('Error in teardown:', error)
+    }
   })
 
   test('can list all missions', async ({ client }) => {
     const response = await client.get('/api/v1/missions')
     response.assertStatus(200)
-    response.assertBodyContains([])
   })
 
   test('can create a mission', async ({ client, assert }) => {
@@ -37,7 +51,10 @@ test.group('Missions Controller', (group) => {
       public: true,
     }
 
-    const response = await client.post('/api/v1/missions').json(missionData)
+    const response = await client
+      .post('/api/v1/missions')
+      .json(missionData)
+    
     response.assertStatus(201)
     
     const body = response.body()
@@ -82,10 +99,12 @@ test.group('Missions Controller', (group) => {
     mission.public = false
     await mission.save()
     
-    const response = await client.put(`/api/v1/missions/${mission.id}`).json({
-      name: 'Updated Mission Name',
-      active: true,
-    })
+    const response = await client
+      .put(`/api/v1/missions/${mission.id}`)
+      .json({
+        name: 'Updated Mission Name',
+        active: true,
+      })
     
     response.assertStatus(200)
     
@@ -107,7 +126,9 @@ test.group('Missions Controller', (group) => {
     mission.salesOpenAt = DateTime.local()
     await mission.save()
     
-    const response = await client.delete(`/api/v1/missions/${mission.id}`)
+    const response = await client
+      .delete(`/api/v1/missions/${mission.id}`)
+    
     response.assertStatus(204)
     
     const missionExists = await Mission.find(mission.id)

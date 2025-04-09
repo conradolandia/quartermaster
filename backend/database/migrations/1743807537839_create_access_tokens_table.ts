@@ -6,14 +6,14 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table
-        .integer('tokenable_id')
-        .notNullable()
-        .unsigned()
-        .references('id')
-        .inTable('users')
-        .onDelete('CASCADE')
 
+      // We can't add a foreign key constraint since we have two different types
+      // of tokenable IDs (integer for users, string for admin users)
+      table.text('tokenable_id').notNullable()
+
+      // Store the type of entity that this token belongs to
+      table.string('tokenable_type').notNullable()
+      
       table.string('type').notNullable()
       table.string('name').nullable()
       table.string('hash').notNullable()
