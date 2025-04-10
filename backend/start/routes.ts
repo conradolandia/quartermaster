@@ -92,3 +92,18 @@ router.group(() => {
   
   router.get('bookings', [BookingsController, 'index'])
 }).prefix('/api/v1')
+
+// --- Admin Routes ---
+const AdminBookingManagementController = () => import('#controllers/Admin/booking_managements_controller')
+
+router.group(() => {
+  // Admin booking management
+  router.get('bookings', [AdminBookingManagementController, 'index'])
+  // Add other admin booking routes here (show, update, delete if needed for MVP admin)
+  // router.get('bookings/:id', [AdminBookingManagementController, 'show'])
+  // router.patch('bookings/:id', [AdminBookingManagementController, 'update'])
+  // router.delete('bookings/:id', [AdminBookingManagementController, 'destroy'])
+  
+  // TODO: Move other admin-only CRUD routes (locations, launches, etc.) here from /api/v1
+  
+}).prefix('/admin').use(middleware.adminAuth()) // Apply admin auth middleware

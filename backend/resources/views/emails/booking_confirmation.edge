@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star✦Fleet Tours Booking Confirmation</title>
+  <style>
+    body { font-family: sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+    h1 { color: #0a2d4c; }
+    .qr-code { text-align: center; margin-top: 20px; }
+    .qr-code img { max-width: 200px; height: auto; }
+    .footer { margin-top: 30px; font-size: 0.9em; color: #777; text-align: center; }
+    strong { color: #1a4a73; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Booking Confirmation</h1>
+
+    <p>Hello {{ booking.userName }},</p>
+
+    <p>Thank you for booking with Star✦Fleet Tours! Your booking <strong>{{ booking.confirmationCode }}</strong> is confirmed.</p>
+
+    <h2>Booking Summary:</h2>
+    <ul>
+      <li><strong>Confirmation Code:</strong> {{ booking.confirmationCode }}</li>
+      <li><strong>Name:</strong> {{ booking.userName }}</li>
+      <li><strong>Email:</strong> {{ booking.userEmail }}</li>
+      {{-- Display Mission Name if available --}}
+      @if(booking.mission?.name)
+        <li><strong>Mission:</strong> {{ booking.mission.name }}</li>
+      @end
+      <li><strong>Total Amount:</strong> ${{ booking.totalAmount.toFixed(2) }}</li>
+      {{-- TODO: Add more details like items, dates, boat info later --}}
+    </ul>
+
+    <h2>Your Ticket:</h2>
+    <p>Please present the QR code below for check-in:</p>
+    <div class="qr-code">
+      {{-- Embed the QR code image using the data URL --}}
+      <img src="{{ qrCodeDataUrl }}" alt="Booking QR Code - {{ booking.confirmationCode }}">
+    </div>
+    <p style="text-align: center;"><a href="https://admin.star-fleet.tours/check-in?booking={{ booking.confirmationCode }}">Check-in Link</a></p>
+
+    <p>We look forward to seeing you!</p>
+
+    <div class="footer">
+      Star✦Fleet Tours | <a href="https://star-fleet.tours">star-fleet.tours</a>
+    </div>
+  </div>
+</body>
+</html> 

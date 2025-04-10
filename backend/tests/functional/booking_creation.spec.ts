@@ -1,6 +1,8 @@
 import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import db from '@adonisjs/lucid/services/db'
+import sinon from 'sinon' // Import sinon
+import EmailService from '#services/EmailService' // Keep alias for consistency
 import Booking, { BookingStatus } from '#models/booking'
 import BookingItem, { ItemType } from '#models/booking_item'
 import Boat from '#models/boat'
@@ -17,6 +19,7 @@ import { DateTime } from 'luxon' // Import DateTime
 
 test.group('Booking Creation API', (group) => {
   let missionConfigService: MissionConfigService
+  let emailServiceStub: sinon.SinonStub
 
   // Config IDs from YAML (used for reference/lookup during setup)
   let missionConfigId: string
@@ -175,17 +178,26 @@ test.group('Booking Creation API', (group) => {
         { id: uuidv4(), maxCapacity: boatConfig2.max_capacity }
     )
     // --- End Create Launch, Mission, Trip, TripBoat records ---
+
+    // Stub EmailService before tests run
+    const emailServiceInstance = await app.container.make(EmailService)
+    emailServiceStub = sinon.stub(emailServiceInstance, 'sendBookingConfirmation').resolves() // Stub to resolve successfully
+    // Re-bind the stubbed instance to the container
+    app.container.singleton(EmailService, () => emailServiceInstance)
   })
 
   // Clean up database tables after each test
   group.each.setup(async () => {
     // Clear bookings first due to foreign key constraints
     await db.rawQuery('TRUNCATE bookings, booking_items CASCADE;')
+    // Reset stub history before each test
+    emailServiceStub.resetHistory()
   })
 
-  // Cleanup all created test data after the group finishes
+  // Restore stubs after the group finishes
   group.teardown(async () => {
     await db.rawQuery('TRUNCATE trip_boats, trips, missions, launches, boats, boat_providers, jurisdictions, locations, admin_users CASCADE;')
+    emailServiceStub.restore()
   })
 
   test('should create a booking successfully with valid data', async ({ client, assert }) => {
@@ -213,6 +225,18 @@ test.group('Booking Creation API', (group) => {
     response.assertBodyContains({ missionId: testMissionDbId, userName: 'Test User' })
     assert.exists(response.body().id)
     assert.exists(response.body().confirmationCode)
+
+    // Add assertion for qrCodeDataUrl
+    assert.exists(response.body().qrCodeDataUrl, 'qrCodeDataUrl should exist in the response')
+    assert.isString(response.body().qrCodeDataUrl, 'qrCodeDataUrl should be a string')
+    assert.match(
+      response.body().qrCodeDataUrl,
+      /^data:image\/png;base64,/,
+      'qrCodeDataUrl should be a data URL'
+    )
+    // You could add a more specific check if you mock the QR code generation
+    // For now, just checking the format is sufficient
+
     assert.equal(response.body().tipAmount, 10.0)
     assert.equal(response.body().subtotal, adultTicketPrice * 2)
     const expectedTax = (adultTicketPrice * 2) * (testJurisdiction.salesTaxRate / 100)
@@ -227,6 +251,14 @@ test.group('Booking Creation API', (group) => {
     assert.equal(bookingItems[0].itemType, ItemType.ADULT_TICKET)
     assert.equal(bookingItems[0].tripId, testTripDbId)
     assert.equal(bookingItems[0].boatId, testBoat1DbId)
+
+    // Assert that EmailService was called
+    assert.isTrue(emailServiceStub.calledOnce, 'EmailService.sendBookingConfirmation should have been called')
+    // Assert arguments passed to EmailService
+    const bookingArg = emailServiceStub.firstCall.args[0] as Booking
+    const qrCodeArg = emailServiceStub.firstCall.args[1] as string
+    assert.equal(bookingArg.id, response.body().id, 'Correct booking object passed to email service')
+    assert.match(qrCodeArg, /^data:image\/png;base64,/, 'QR code data URL passed to email service')
   })
 
   test('should fail with validation error if missionId is not a UUID', async ({ client }) => {

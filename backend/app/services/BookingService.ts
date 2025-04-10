@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { Exception } from '@adonisjs/core/exceptions'
 import MissionConfigService from './MissionConfigService.js'
 import PaymentService from './PaymentService.js'
+import QrCodeService from './qr_code_service.js'
+import EmailService from './EmailService.js'
 import Booking, { BookingStatus } from '#models/booking'
 import BookingItem, { ItemStatus, ItemType } from '#models/booking_item'
 import Boat from '#models/boat'
@@ -32,14 +34,16 @@ export interface CreateBookingData {
 
 // Output structure after successful booking creation
 export interface BookingCreationResult {
-  booking: Booking
+  booking: Booking & { qrCodeDataUrl?: string }
 }
 
 @inject()
 export default class BookingService {
   constructor(
     protected missionConfigService: MissionConfigService,
-    protected paymentService: PaymentService
+    protected paymentService: PaymentService,
+    protected qrCodeService: QrCodeService,
+    protected emailService: EmailService
   ) {}
 
   /**
@@ -293,31 +297,47 @@ export default class BookingService {
       }))
       await BookingItem.createMany(itemsToCreate, { client: trx })
 
-      // --- 7. Process Mock Payment ---
+      // --- 7. Mock Payment Processing ---
       const paymentResult = await this.paymentService.processPayment(newBooking)
-
-      // --- 8. Update Booking Status based on Payment ---
-      if (paymentResult.success) {
-        newBooking.status = BookingStatus.CONFIRMED
-        newBooking.paymentIntentId = paymentResult.paymentIntentId
-        await newBooking.save() // Save changes within the transaction
-      } else {
-        // Handle payment failure - potentially mark booking as failed or keep pending
-        // For MVP mock, we assume success, but this is where failure logic would go.
-        console.error(`Mock payment failed for booking ${newBooking.id}: ${paymentResult.errorMessage}`)
-        // Optional: Throw an exception to rollback the transaction on mock failure
-        // throw new Exception('Mock Payment Failed', { code: 'E_PAYMENT_FAILED', status: 500 });
+      if (!paymentResult.success) {
+        // Payment failed, rollback transaction
+        throw new Exception('Mock payment failed', { code: 'E_PAYMENT_FAILED', status: 500 })
       }
 
-      // --- Commit Transaction ---
+      // --- 8. Update Booking Status and Payment ID ---
+      newBooking.status = BookingStatus.CONFIRMED
+      newBooking.paymentIntentId = paymentResult.paymentIntentId
+      await newBooking.save()
+
+      // --- 9. Generate QR Code ---
+      const checkInUrl = `https://admin.star-fleet.tours/check-in?booking=${newBooking.confirmationCode}`
+      const qrCodeDataUrl = await this.qrCodeService.generateQrCodeDataUrl(checkInUrl)
+
+      // --- 10. Commit Transaction ---
       await trx.commit()
 
-      // --- 9. Return successful result (outside transaction) ---
-      // Reload relations if needed after commit
-      await newBooking.load('bookingItems')
-      await newBooking.load('mission')
+      // --- 11. Send Confirmation Email (After Commit) ---
+      try {
+        await this.emailService.sendBookingConfirmation(newBooking, qrCodeDataUrl)
+      } catch (emailError) {
+        // Log the email error but don't rollback the transaction
+        // The booking is confirmed, but email failed.
+        // Consider adding a retry mechanism or flagging the booking for manual email send.
+        console.error(`Failed to send confirmation email for booking ${newBooking.confirmationCode} after transaction commit:`, emailError)
+        // Potentially update booking status to indicate email failure?
+        // newBooking.status = BookingStatus.CONFIRMED_EMAIL_FAILED; // Example status
+        // await newBooking.save(); // Save outside the original transaction
+      }
 
-      return { booking: newBooking }
+      // --- 12. Return Booking with QR Code ---
+      // Add QR code to the booking object before returning
+      // We need to cast to 'any' temporarily to add the property
+      const bookingWithQrCode: any = newBooking.toJSON()
+      bookingWithQrCode.qrCodeDataUrl = qrCodeDataUrl
+
+      return {
+        booking: bookingWithQrCode as Booking & { qrCodeDataUrl?: string },
+      }
     } catch (error) {
       // --- Rollback Transaction on Error ---
       await trx.rollback()
