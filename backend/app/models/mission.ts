@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, belongsTo, hasMany, computed } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Launch from './launch.js'
 import Trip from './trip.js'
@@ -15,14 +15,25 @@ export default class Mission extends BaseModel {
   @column()
   declare name: string
 
-  @column.dateTime()
-  declare salesOpenAt: DateTime
+  @column()
+  declare configId: string | null
 
   @column()
   declare active: boolean
 
   @column()
   declare public: boolean
+
+  @column()
+  declare refundCutoffHours: number
+
+  @computed()
+  get salesAreOpen() {
+    return this.salesOpenAt ? this.salesOpenAt <= DateTime.now() : false
+  }
+
+  @column.dateTime()
+  declare salesOpenAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

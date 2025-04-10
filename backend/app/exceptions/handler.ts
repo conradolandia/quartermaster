@@ -37,7 +37,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * The method is used to report error to the logging service or
    * the third party error monitoring service.
    *
-   * @note You should not attempt to send a response from this method.
+   * @note Do not attempt to send a response from this method.
    */
   async report(error: unknown, ctx: HttpContext) {
     if (!app.inProduction) {

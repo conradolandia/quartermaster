@@ -1,18 +1,31 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import Booking, { BookingStatus } from '#models/booking'
-import { v4 as uuidv4 } from 'uuid'
+import Booking from '#models/booking'
+import { createBookingValidator } from '#validators/create_booking_validator'
+import { inject } from '@adonisjs/core'
+import BookingService from '#services/BookingService'
 
+@inject()
 export default class BookingsController {
+  constructor(protected bookingService: BookingService) {}
+
   /**
    * Display a list of all bookings
    */
   async index({ response }: HttpContext) {
-    const bookings = await Booking.query()
-      .preload('mission')
-      .preload('bookingItems', (query) => {
-        query.preload('trip')
-      })
-    return response.json(bookings)
+    console.log('[BookingsController.index] Received request');
+    try {
+      const bookings = await Booking.query()
+        .preload('mission')
+        .preload('bookingItems', (query) => {
+          query.preload('trip')
+          query.preload('boat')
+        })
+      console.log('[BookingsController.index] Query completed, found:', bookings.length);
+      return response.json(bookings)
+    } catch (error) {
+      console.error('[BookingsController.index] Error during query:', error);
+      return response.status(500).json({ message: 'Error retrieving bookings' });
+    }
   }
 
   /**
@@ -24,46 +37,50 @@ export default class BookingsController {
     await booking.load('mission')
     await booking.load('bookingItems', (query) => {
       query.preload('trip')
+      query.preload('boat')
     })
     await booking.load('payments')
     return response.json(booking)
   }
 
   /**
-   * Create a new booking
+   * Create a new booking using BookingService
    */
   async store({ request, response }: HttpContext) {
-    const data = request.only([
-      'mission_id',
-      'user_name',
-      'user_email',
-      'user_phone',
-      'billing_address',
-      'status',
-      'total_amount',
-      'special_requests',
-      'launch_updates_preference',
-    ])
+    // console.log('CONTROLLER - Incoming raw request body:', request.body()); // Log raw body
+    const validatedData = await request.validateUsing(createBookingValidator)
+    // console.log('CONTROLLER - Validated data:', validatedData); // Log after validation (if successful)
 
-    const booking = await Booking.create({
-      id: uuidv4(),
-      confirmationCode: generateConfirmationCode(),
-      missionId: data.mission_id,
-      userName: data.user_name,
-      userEmail: data.user_email,
-      userPhone: data.user_phone,
-      billingAddress: data.billing_address || '',
-      status: data.status || BookingStatus.PENDING_PAYMENT,
-      totalAmount: data.total_amount || 0,
-      subtotal: 0,
-      discountAmount: 0,
-      taxAmount: 0,
-      tipAmount: 0,
-      specialRequests: data.special_requests || null,
-      launchUpdatesPreference: data.launch_updates_preference || false,
-    })
+    try {
+      const { booking } = await this.bookingService.createBooking({
+        missionId: validatedData.missionId,
+        userName: validatedData.userName,
+        userEmail: validatedData.userEmail,
+        userPhone: validatedData.userPhone,
+        billingAddress: validatedData.billingAddress,
+        specialRequests: validatedData.specialRequests,
+        tipAmount: validatedData.tipAmount,
+        items: validatedData.items.map((item) => ({
+          tripId: item.tripId,
+          boatId: item.boatId,
+          itemType: item.itemType,
+          quantity: item.quantity,
+        })),
+      })
 
-    return response.status(201).json(booking)
+      return response.status(201).json(booking)
+    } catch (error) {
+      if (error.code === 'E_MISSION_INVALID') {
+        return response.status(400).json({ message: error.message })
+      }
+      if (error.code === 'E_INSUFFICIENT_CAPACITY') {
+        return response.status(409).json({ message: error.message })
+      }
+      console.error('Booking creation failed:', error)
+      return response.status(error.status || 500).json({
+        message: error.message || 'An unexpected error occurred during booking creation.',
+      })
+    }
   }
 
   /**
@@ -80,20 +97,11 @@ export default class BookingsController {
       'user_phone',
       'billing_address',
       'status',
-      'total_amount',
       'special_requests',
       'launch_updates_preference',
     ])
 
-    booking.missionId = data.mission_id || booking.missionId
-    booking.userName = data.user_name || booking.userName
-    booking.userEmail = data.user_email || booking.userEmail
-    booking.userPhone = data.user_phone || booking.userPhone
-    booking.billingAddress = data.billing_address || booking.billingAddress
-    if (data.status) booking.status = data.status
-    if (data.total_amount !== undefined) booking.totalAmount = data.total_amount
-    if (data.special_requests !== undefined) booking.specialRequests = data.special_requests
-    if (data.launch_updates_preference !== undefined) booking.launchUpdatesPreference = data.launch_updates_preference
+    booking.merge(data)
 
     await booking.save()
     await booking.load('mission')
@@ -112,11 +120,4 @@ export default class BookingsController {
     
     return response.status(204).noContent()
   }
-}
-
-/**
- * Generate a random confirmation code
- */
-function generateConfirmationCode(): string {
-  return Math.random().toString(36).substring(2, 10).toUpperCase()
 } 

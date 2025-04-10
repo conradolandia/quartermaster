@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.uuid('id').primary()
       table.uuid('mission_id').notNullable().references('id').inTable('missions').onDelete('CASCADE')
       table.enum('type', ['launch_viewing', 'pre_launch']).notNullable()
+      table.string('config_id').notNullable().unique()
       table.boolean('active').defaultTo(false).notNullable()
       table.timestamp('check_in_time', { useTz: true }).notNullable()
       table.timestamp('boarding_time', { useTz: true }).notNullable()

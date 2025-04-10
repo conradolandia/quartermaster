@@ -22,6 +22,9 @@ export default class Trip extends BaseModel {
   declare type: TripType
 
   @column()
+  declare configId: string
+
+  @column()
   declare active: boolean
 
   @column.dateTime()

@@ -4,7 +4,7 @@
 |--------------------------------------------------------------------------
 |
 | The "server.ts" file is the entrypoint for starting the AdonisJS HTTP
-| server. Either you can run this file directly or use the "serve"
+| server. Either we can run this file directly or use the "serve"
 | command to run this file and monitor file changes
 |
 */

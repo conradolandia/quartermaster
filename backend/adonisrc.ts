@@ -72,5 +72,9 @@ export default defineConfig({
   metaFiles: [{
     pattern: 'public/**',
     reloadServer: false,
+  },
+  {
+    pattern: 'data/missions.yml',
+    reloadServer: false, // Set to false for tests/production
   }]
 })

@@ -5,7 +5,7 @@
 |
 | The "test.ts" file is the entrypoint for running tests using Japa.
 |
-| Either you can run this file directly or use the "test"
+| Either we can run this file directly or use the "test"
 | command to run this file and monitor file changes.
 |
 */

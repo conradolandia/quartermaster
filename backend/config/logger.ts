@@ -27,8 +27,8 @@ const loggerConfig = defineConfig({
 export default loggerConfig
 
 /**
- * Inferring types for the list of loggers you have configured
- * in your application.
+ * Inferring types for the list of loggers we have configured
+ * in our application.
  */
 declare module '@adonisjs/core/types' {
   export interface LoggersList extends InferLoggers<typeof loggerConfig> {}

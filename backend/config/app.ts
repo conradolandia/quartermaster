@@ -20,8 +20,8 @@ export const http = defineConfig({
   allowMethodSpoofing: false,
 
   /**
-   * Enabling async local storage will let you access HTTP context
-   * from anywhere inside your application.
+   * Enabling async local storage will let us access HTTP context
+   * from anywhere inside our application.
    */
   useAsyncLocalStorage: false,
 

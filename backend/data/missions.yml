@@ -1,0 +1,43 @@
+launch:
+  id: falcon9-123
+  name: Falcon 9 CRS-25
+  date_time: 2023-07-15T12:30:00Z
+  location_id: cape # Corresponds to Location model ID/name
+
+missions:
+  - id: mission-crs25-take1 # Unique ID for this mission attempt
+    name: Falcon 9 CRS-25 - Take 1
+    launch_id: falcon9-123 # Link to the launch defined above
+    active: true
+    public: true
+    sales_open_at: 2023-06-15T00:00:00Z
+    refund_cutoff_hours: 12
+
+    trips:
+      - id: trip-crs25-viewing # Unique ID for this specific trip
+        type: launch_viewing
+        check_in_time: 2023-07-15T10:00:00Z # Example: T-2.5 hours
+        boarding_time: 2023-07-15T10:30:00Z # Example: T-2 hours
+        departure_time: 2023-07-15T11:00:00Z # Example: T-1.5 hours
+        pricing:
+          adult_ticket: 100.00
+          child_ticket: 75.00
+        boats:
+          - boat_id: endeavour # Corresponds to Boat model ID/name
+            max_capacity: 150
+          - boat_id: discovery # Corresponds to Boat model ID/name
+            max_capacity: 125
+
+      - id: trip-crs25-prelaunch # Unique ID for this specific trip
+        type: pre_launch
+        check_in_time: 2023-07-14T08:00:00Z
+        boarding_time: 2023-07-14T08:30:00Z
+        departure_time: 2023-07-14T09:00:00Z
+        pricing:
+          adult_ticket: 80.00
+          child_ticket: 60.00
+        boats:
+          - boat_id: endeavour
+            # Uses default boat capacity if max_capacity not specified
+
+# Add more launches and missions here as needed 
